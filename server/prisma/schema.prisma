@@ -1,13 +1,214 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  LOST
+}
+
+enum LeadSource {
+  REFERRAL
+  LINKEDIN
+  COLD_EMAIL
+  EVENT
+  OTHER
+}
+
+enum DealStage {
+  PROSPECT
+  PROPOSAL_SENT
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+}
+
+enum PaymentStatus {
+  PENDING
+  RECEIVED
+  OVERDUE
+}
+
+model Team {
+  id           String   @id @default(uuid())
+  name         String
+  startupName  String
+  createdAt    DateTime @default(now())
+
+  users         User[]
+  leads         Lead[]
+  deals         Deal[]
+  proposals     Proposal[]
+  meetings      Meeting[]
+  payments      Payment[]
+  notifications Notification[]
+  activityLogs  ActivityLog[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(MEMBER)
+  teamId       String
+  createdAt    DateTime @default(now())
+
+  team              Team           @relation(fields: [teamId], references: [id])
+  assignedLeads     Lead[]         @relation("AssignedLeads")
+  createdMeetings   Meeting[]      @relation("CreatedMeetings")
+  notifications     Notification[]
+  activityLogs      ActivityLog[]
+  invites           Invite[]
+}
+
+model Invite {
+  id        String   @id @default(uuid())
+  email     String
+  role      Role     @default(MEMBER)
+  token     String   @unique
+  teamId    String
+  invitedBy String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  inviter   User     @relation(fields: [invitedBy], references: [id])
+}
+
+model Lead {
+  id         String     @id @default(uuid())
+  teamId     String
+  name       String
+  email      String
+  company    String?
+  phone      String?
+  source     LeadSource
+  status     LeadStatus @default(NEW)
+  assignedTo String?
+  notes      String?
+  deletedAt  DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  team       Team     @relation(fields: [teamId], references: [id])
+  assignee   User?    @relation("AssignedLeads", fields: [assignedTo], references: [id])
+  deals      Deal[]
+  meetings   Meeting[]
+}
+
+model Deal {
+  id              String    @id @default(uuid())
+  teamId          String
+  leadId          String
+  title           String
+  value           Decimal   @db.Decimal(10, 2)
+  stage           DealStage @default(PROSPECT)
+  probability     Int       @default(10)
+  expectedClose   DateTime?
+  notes           String?
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  team      Team       @relation(fields: [teamId], references: [id])
+  lead      Lead       @relation(fields: [leadId], references: [id])
+  proposals Proposal[]
+  payments  Payment[]
+}
+
+model Proposal {
+  id        String         @id @default(uuid())
+  teamId    String
+  dealId    String
+  title     String
+  content   String
+  status    ProposalStatus @default(DRAFT)
+  sentAt    DateTime?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id])
+  deal Deal @relation(fields: [dealId], references: [id])
+}
+
+model Meeting {
+  id          String   @id @default(uuid())
+  teamId      String
+  leadId      String?
+  title       String
+  scheduledAt DateTime
+  notes       String?
+  actionItems Json     @default("[]")
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  team    Team  @relation(fields: [teamId], references: [id])
+  lead    Lead? @relation(fields: [leadId], references: [id])
+  creator User  @relation("CreatedMeetings", fields: [createdBy], references: [id])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  teamId        String
+  dealId        String
+  amount        Decimal       @db.Decimal(10, 2)
+  status        PaymentStatus @default(PENDING)
+  dueDate       DateTime
+  paidAt        DateTime?
+  invoiceNumber String?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id])
+  deal Deal @relation(fields: [dealId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  teamId    String
+  message   String
+  type      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  teamId    String
+  userId    String
+  action    String
+  entity    String
+  entityId  String
+  meta      Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
