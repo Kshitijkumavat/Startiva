@@ -32,6 +32,7 @@ app.use("/api/proposals", require("./routes/proposals"));
 app.use("/api/meetings", require("./routes/meetings"));
 app.use("/api/payments", require("./routes/payments"));
 app.use("/api/notifications", require("./routes/notifications"));
+app.use("/api/dashboard", require("./routes/dashboard"));
 
 app.use((req, res) => {
   res.status(404).json({ success: false, error: "Route not found" });
