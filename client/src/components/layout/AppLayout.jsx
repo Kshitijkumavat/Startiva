@@ -1,3 +1,5 @@
-﻿export default function AppLayout() { 
-    return <div>Loading...</div> 
+import { Outlet } from "react-router-dom";
+
+export default function AppLayout() {
+  return <Outlet />;
 }

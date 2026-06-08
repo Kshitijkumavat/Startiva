@@ -1,3 +1,3 @@
-﻿export default function Team() { 
+export default function Team() { 
     return <div>Team</div> 
 }
