@@ -51,17 +51,22 @@ export const features = [
 export const steps = [
   {
     icon: Timer,
-    title: "Create your workspace",
-    text: "Add your startup, invite co-founders, and choose the deal stages that match how you sell.",
+    title: "Connect your tools",
+    text: "Link your existing stack in a few clicks. 40+ integrations with zero configuration needed.",
   },
   {
     icon: Users,
-    title: "Add leads and deals",
-    text: "Capture prospects, attach notes, and generate proposals when a lead is ready to move.",
+    title: "Configure your workflow",
+    text: "Set rules, filters, and triggers using our visual editor — built around how your team works.",
   },
   {
     icon: CheckCircle2,
-    title: "Close and get paid",
-    text: "Track signed deals, payment status, and follow-ups from one clean operating view.",
+    title: "Invite your team",
+    text: "Add co-founders and teammates instantly. Roles and shared views ready out of the box.",
   },
+  {
+    icon: CheckCircle2,
+    title: "Go live instantly",
+    text: "Publish with one click. Watch leads, deals, and payments flow in from day one.",
+  }
 ];

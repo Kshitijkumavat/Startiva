@@ -10,7 +10,7 @@ export default function Logo({ inverted = false }) {
       >
         <Sparkles className="h-4 w-4" strokeWidth={2.4} />
       </div>
-      <span className={`font-bold ${inverted ? "text-sm text-white" : "text-base text-slate-950"}`}>Startiva</span>
+      <span className={`font-semibold ${inverted ? "text-sm text-white" : "text-base text-slate-950"}`}>Startiva</span>
     </div>
   );
 }

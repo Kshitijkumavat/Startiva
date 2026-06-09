@@ -19,29 +19,23 @@ export default function HeroSection() {
             <Sparkles className="h-4 w-4" />
             Built for student founders
           </GlowBadge>
-          <h1 className="landing-rise mx-auto mt-6 max-w-4xl text-4xl font-bold leading-tight text-slate-950 sm:text-5xl lg:text-6xl">
-            <Typewriter
-              text={"The CRM built for student founders."}
-              speed={80}
-              delay={2000}
-              loop={false}
-              cursor="_"
-            />
+          <h1 className="landing-rise landing-hero-title mx-auto mt-6 max-w-4xl">
+            The CRM built for student founders.
           </h1>
-          <p className="landing-rise mx-auto mt-5 max-w-2xl text-base font-medium leading-8 text-slate-600 sm:text-lg">
+          <p className="landing-rise landing-section-copy mx-auto mt-5 max-w-2xl sm:text-lg sm:leading-8">
             Manage leads, close deals, and track payments in one lightweight workspace for 2-5 person founding teams.
           </p>
           <div id="get-started" className="landing-rise mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
               href="/register"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-slate-300 transition duration-300 hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-300 transition duration-300 hover:-translate-y-0.5 hover:bg-slate-800 sm:w-auto"
             >
               Get started free
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
               href="#how-it-works"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white/70 px-5 py-3 text-sm font-bold text-slate-800 transition duration-300 hover:-translate-y-0.5 hover:border-slate-400 hover:shadow-md sm:w-auto"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white/70 px-5 py-3 text-sm font-semibold text-slate-800 transition duration-300 hover:-translate-y-0.5 hover:border-slate-400 hover:shadow-md sm:w-auto"
             >
               See how it works
             </a>

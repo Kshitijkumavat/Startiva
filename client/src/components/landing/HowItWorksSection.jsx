@@ -1,85 +1,142 @@
+import { useEffect, useRef } from "react";
 import { steps } from "./landingData";
 
-export default function HowItWorksSection() {
-  return (
-    <section
-      id="how-it-works"
-      className="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white px-4 py-24 sm:px-6 lg:px-8"
-    >
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-20 h-[350px] w-[350px] -translate-x-1/2 rounded-full bg-cyan-200/20 blur-[120px]" />
-      </div>
+const stepMeta = [
+  { tag: "Access", icon: "ti-key" },
+  { tag: "Organize", icon: "ti-layout-board" },
+  { tag: "Close", icon: "ti-circle-check" },
+  { tag: "Launch", icon: "ti-rocket" },
+];
 
+export default function HowItWorksSection() {
+  const tlRef = useRef(null);
+  const spineFillRef = useRef(null);
+  const dotRefs = useRef([]);
+  const contentRefs = useRef([]);
+
+  useEffect(() => {
+    const tl = tlRef.current;
+    if (!tl) return;
+
+    function update() {
+      const rect = tl.getBoundingClientRect();
+      const windowH = window.innerHeight;
+      const total = rect.height + windowH;
+      const travelled = windowH - rect.top;
+      const pct = Math.max(0, Math.min(100, (travelled / total) * 100));
+
+      spineFillRef.current.style.height = `${pct}%`;
+
+      dotRefs.current.forEach((dot, i) => {
+        if (!dot) return;
+        const dotRect = dot.getBoundingClientRect();
+        const dotCenter = dotRect.top + dotRect.height / 2;
+        const lit = dotCenter < windowH * 0.65; 
+        dot.classList.toggle("hiw-dot-lit", lit);
+        contentRefs.current[i]?.classList.toggle("hiw-content-lit", lit);
+      });
+    }
+
+    window.addEventListener("scroll", update, { passive: true });
+    update(); 
+    return () => window.removeEventListener("scroll", update);
+  }, []);
+
+  return (
+    <section id="how-it-works" className="bg-[#f7f8fc] px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
-        <div className="mx-auto mb-20 max-w-2xl text-center">
-          <p className="text-sm font-bold uppercase text-cyan-700">How it Works</p>
-          <h2 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">
+
+        <div className="mb-16 text-center">
+          <p className="landing-eyebrow">
+            How it works
+          </p>
+          <h2 className="landing-section-title mt-4">
             Up and running in minutes.
           </h2>
+          <p className="landing-section-copy mx-auto mt-5 max-w-2xl">
+            A simple sales workflow that moves from setup to closed deals without changing tools.
+          </p>
         </div>
 
-        <div className="relative">
-          <div className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-gradient-to-b from-cyan-200 via-slate-200 to-transparent md:block" />
+        <div ref={tlRef} className="relative flex flex-col items-center">
 
-          <div className="space-y-8">
-            {steps.map(({ icon: Icon, title, text }, index) => {
-              const isLeft = index % 2 === 0;
-
-              return (
-                <div
-                  key={title}
-                  className="grid items-center gap-8 md:grid-cols-2"
-                >
-                  <div
-                    className={`${
-                      isLeft ? "md:pr-14" : "md:order-2 md:pl-14"
-                    }`}
-                  >
-                    <div className="group relative rounded-3xl border border-slate-200/70 bg-white/90 p-6 shadow-sm backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-cyan-200 hover:shadow-xl">
-                      
-                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-50/0 to-cyan-100/0 opacity-0 transition duration-300 group-hover:opacity-100" />
-
-                      <div className="relative z-10">
-                        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-50 ring-1 ring-cyan-100 transition duration-300 group-hover:scale-110">
-                          <Icon className="h-5 w-5 text-cyan-700" />
-                        </div>
-
-                        <div className="mb-3 flex items-center gap-3">
-                          <span className="text-sm font-medium text-cyan-700">
-                            Step {index + 1}
-                          </span>
-                        </div>
-
-                        <h3 className="text-xl font-semibold text-slate-950">
-                          {title}
-                        </h3>
-
-                        <p className="mt-3 text-sm leading-7 text-slate-600">
-                          {text}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`relative hidden md:flex ${
-                      isLeft ? "justify-start" : "justify-end"
-                    }`}
-                  >
-                    <div className="absolute left-1/2 top-1/2 h-px w-full -translate-y-1/2 bg-slate-200" />
-
-                    <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-cyan-200 bg-white shadow-md ring-8 ring-slate-50">
-                      <span className="text-sm font-semibold text-cyan-700">
-                        {index + 1}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="absolute bottom-5 left-1/2 top-5 w-px -translate-x-1/2 overflow-hidden rounded-full bg-slate-200">
+            <div
+              ref={spineFillRef}
+              className="absolute left-0 top-0 w-full rounded-full bg-teal-500 transition-[height] duration-300"
+              style={{ height: "0%" }}
+            />
           </div>
+
+          {steps.map(({ icon: Icon, title, text }, i) => {
+            const isLeft = i % 2 === 0;
+            const meta = stepMeta[i] ?? { tag: "Step", icon: "ti-circle" };
+            const num = String(i + 1).padStart(2, "0");
+
+            const content = (
+              <div
+                ref={(el) => (contentRefs.current[i] = el)}
+                className={`pt-1 opacity-40 transition-opacity duration-300 ${
+                  isLeft ? "text-right pr-8" : "text-left pl-8"
+                }`}
+              >
+                <p className={`mb-2 flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-widest text-slate-400 ${isLeft ? "justify-end" : "justify-start"}`}>
+                  <i className={`ti ${meta.icon}`} style={{ fontSize: 13 }} aria-hidden="true" />
+                  {num} — {meta.tag}
+                </p>
+                <h3 className="text-2xl font-medium leading-tight text-slate-950 sm:text-3xl">
+                  {title}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-slate-500">{text}</p>
+              </div>
+            );
+
+            const dot = (
+              <div className="flex w-14 shrink-0 justify-center">
+                <div
+                  ref={(el) => (dotRefs.current[i] = el)}
+                  className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-teal-600 text-xs font-medium text-white transition-all duration-300"
+                >
+                  {num}
+                </div>
+              </div>
+            );
+
+            return (
+              <div
+                key={title}
+                className="mb-16 grid w-full last:mb-0"
+                style={{ gridTemplateColumns: "1fr 56px 1fr" }}
+              >
+                {isLeft ? (
+                  <>
+                    {content}
+                    {dot}
+                    <div />
+                  </>
+                ) : (
+                  <>
+                    <div />
+                    {dot}
+                    {content}
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
+
+      <style>{`
+        .hiw-dot-lit {
+          transform: scale(1.1);
+          background: #0F6E56 !important;
+          box-shadow: 0 0 0 4px #E1F5EE;
+        }
+        .hiw-content-lit {
+          opacity: 1 !important;
+        }
+      `}</style>
     </section>
   );
 }
