@@ -3,22 +3,14 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import GlowBadge from "./GlowBadge";
 import ProductPreview from "./ProductPreview";
 import { Typewriter } from "../ui/typewriter-text";
+import MeshGradientHero from "../ui/MeshGradientHero";
 
 export default function HeroSection() {
   return (
     <section className="relative px-4 pb-16 pt-14 sm:px-6 sm:pb-20 sm:pt-20 lg:px-8">
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: "radial-gradient(125% 125% at 50% 10%, #fff 40%, #475569 100%)",
-        }}
-      />
-      <div className="mx-auto max-w-7xl">
+      <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mx-auto max-w-4xl text-center">
-          <GlowBadge>
-            <Sparkles className="h-4 w-4" />
-            Built for student founders
-          </GlowBadge>
+          <br></br>
           <h1 className="landing-rise landing-hero-title mx-auto mt-6 max-w-4xl">
             The CRM built for student founders.
           </h1>

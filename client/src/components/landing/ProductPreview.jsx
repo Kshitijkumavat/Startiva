@@ -1,9 +1,79 @@
+import { useEffect, useRef, useState } from "react";
 import { CheckCircle2, FileText, Send, Users } from "lucide-react";
 import PipelineCard from "./PipelineCard";
 
+function useCountUp(target, start, duration = 900) {
+  const [value, setValue] = useState(0);
+  const startedRef = useRef(false);
+
+  useEffect(() => {
+    if (!start || startedRef.current) return;
+    startedRef.current = true;
+
+    const prefersReduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReduced) {
+      setValue(target);
+      return;
+    }
+
+    let raf;
+    const startTime = performance.now();
+    const tick = (now) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); 
+      setValue(target * eased);
+      if (progress < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [start, target, duration]);
+
+  return value;
+}
+
+function formatK(value) {
+  return `$${value.toFixed(1)}k`;
+}
+
+const TEAM = [
+  { name: "Aarav", pct: 75, dot: "bg-cyan-100", bar: "bg-cyan-500" },
+  { name: "Maya", pct: 50, dot: "bg-amber-100", bar: "bg-amber-500" },
+  { name: "Jordan", pct: 66.67, dot: "bg-violet-100", bar: "bg-violet-500" },
+];
+
 export default function ProductPreview() {
+  const containerRef = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const newAmount = useCountUp(8.2, inView);
+  const proposalAmount = useCountUp(14.8, inView);
+  const wonAmount = useCountUp(6.4, inView);
+  const readyToCollect = useCountUp(12.4, inView);
+
   return (
-    <div className="landing-float relative mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-200/70">
+    <div
+      ref={containerRef}
+      className="landing-float relative mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-200/70"
+    >
       <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 sm:p-5">
         <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
@@ -17,7 +87,7 @@ export default function ProductPreview() {
           </div>
           <div className="flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
             <CheckCircle2 className="h-3.5 w-3.5" />
-            $12.4k ready to collect
+            {formatK(readyToCollect)} ready to collect
           </div>
         </div>
 
@@ -28,13 +98,16 @@ export default function ProductPreview() {
               <Users className="h-4 w-4 text-slate-400" />
             </div>
             <div className="space-y-3">
-              {["Aarav", "Maya", "Jordan"].map((name, index) => (
-                <div key={name} className="flex items-center gap-3">
-                  <div className={`h-8 w-8 rounded-full ${["bg-cyan-100", "bg-amber-100", "bg-violet-100"][index]}`} />
+              {TEAM.map((member) => (
+                <div key={member.name} className="flex items-center gap-3">
+                  <div className={`h-8 w-8 rounded-full ${member.dot}`} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-slate-700">{name}</p>
+                    <p className="text-xs font-semibold text-slate-700">{member.name}</p>
                     <div className="mt-1 h-1.5 rounded-full bg-slate-100">
-                      <div className={`h-1.5 rounded-full ${["w-3/4 bg-cyan-500", "w-1/2 bg-amber-500", "w-2/3 bg-violet-500"][index]}`} />
+                      <div
+                        className={`h-1.5 rounded-full ${member.bar} transition-[width] duration-[900ms] ease-out`}
+                        style={{ width: inView ? `${member.pct}%` : "0%" }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -43,9 +116,9 @@ export default function ProductPreview() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <PipelineCard title="New" amount="$8.2k" tone="bg-cyan-500" items={["Campus app", "Brand refresh"]} />
-            <PipelineCard title="Proposal" amount="$14.8k" tone="bg-amber-500" items={["AI tutor pilot", "Creator CRM"]} />
-            <PipelineCard title="Won" amount="$6.4k" tone="bg-emerald-500" items={["Design sprint"]} />
+            <PipelineCard title="New" amount={formatK(newAmount)} tone="bg-cyan-500" items={["Campus app", "Brand refresh"]} />
+            <PipelineCard title="Proposal" amount={formatK(proposalAmount)} tone="bg-amber-500" items={["AI tutor pilot", "Creator CRM"]} />
+            <PipelineCard title="Won" amount={formatK(wonAmount)} tone="bg-emerald-500" items={["Design sprint"]} />
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-slate-950 p-4 text-white shadow-sm">
