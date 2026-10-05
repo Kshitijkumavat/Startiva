@@ -99,7 +99,7 @@ export default function LandingFooter() {
 
         {/* Spacer so the illustration has room to show beneath the columns
             before the bottom bar appears */}
-        <div className="h-56 sm:h-72" />
+        <div className="h-40 sm:h-52" />
 
         {/* Bottom bar: socials left, legal links right */}
         <div className="flex flex-col gap-4 border-t border-slate-200/70 bg-transparent py-6 sm:flex-row sm:items-center sm:justify-between">
@@ -121,7 +121,7 @@ export default function LandingFooter() {
             ))}
           </div>
 
-          <div className="flex gap-6 bg-transparent text-sm text-slate-500">
+          <div className="flex gap-6 bg-transparent text-sm text-slate-700">
             <a href="#" className="transition hover:text-slate-950">Privacy Policy</a>
             <a href="#" className="transition hover:text-slate-950">Terms of Service</a>
             <a href="#" className="transition hover:text-slate-950">Cookie Policy</a>
